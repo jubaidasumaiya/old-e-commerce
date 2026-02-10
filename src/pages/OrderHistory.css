@@ -1,0 +1,51 @@
+/* OrderHistory.css */
+.order-history-container {
+  max-width: 900px;
+  margin: 50px auto;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+}
+
+.order-history-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
+}
+
+.order-card {
+  background: #fff;
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.order-card h3 {
+  margin-bottom: 15px;
+  color: #34495e;
+}
+
+.order-card p {
+  margin: 5px 0;
+  font-size: 15px;
+}
+
+.order-card ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0;
+}
+
+.order-card li {
+  background: #f7f9fa;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.order-card h4 {
+  margin: 10px 0 5px 0;
+  color: #2c3e50;
+}

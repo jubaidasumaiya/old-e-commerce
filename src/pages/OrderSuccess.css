@@ -1,0 +1,75 @@
+/* OrderSuccess.css */
+.order-success-container {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+  color: #333;
+}
+
+.order-success-container h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.order-success-container h3 {
+  color: #34495e;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 5px;
+}
+
+.order-success-container p,
+.order-success-container li {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.order-success-container ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 20px;
+}
+
+.order-success-container li {
+  background: #f7f9fa;
+  padding: 10px 15px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-back-home {
+  display: inline-block;
+  background: #3498db;
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-back-home:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .order-success-container {
+    padding: 20px;
+    margin: 30px 15px;
+  }
+
+  .btn-back-home {
+    width: 100%;
+    text-align: center;
+  }
+}
