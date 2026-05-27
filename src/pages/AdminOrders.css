@@ -1,0 +1,93 @@
+.admin-container {
+  padding: 20px;
+  font-family: Arial;
+  background: #f4f4f4;
+  min-height: 100vh;
+}
+
+h2 {
+  text-align: center;
+}
+
+/* 🔥 SUMMARY */
+.summary-box {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.card {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* 🔍 FILTER */
+.filter-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filter-box input,
+.filter-box select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* 📦 TABLE */
+table {
+  width: 100%;
+  background: white;
+  border-collapse: collapse;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+th {
+  background: black;
+  color: white;
+  padding: 10px;
+}
+
+td {
+  text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 🔘 BUTTONS */
+button {
+  margin: 3px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+button:nth-child(1) {
+  background: orange;
+  color: white;
+}
+
+button:nth-child(2) {
+  background: green;
+  color: white;
+}
+
+button:nth-child(3) {
+  background: blue;
+  color: white;
+}
+
+.delete {
+  background: red;
+  color: white;
+}

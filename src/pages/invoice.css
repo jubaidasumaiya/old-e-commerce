@@ -1,0 +1,60 @@
+.invoice-container {
+  width: 800px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border: 1px solid #ddd;
+  font-family: Arial;
+}
+
+.invoice-header {
+  text-align: center;
+  border-bottom: 2px solid black;
+  margin-bottom: 20px;
+}
+
+.customer-box {
+  margin: 15px 0;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.invoice-table th,
+.invoice-table td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
+}
+
+.total-box {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.print-btn {
+  margin: 10px;
+  padding: 10px 15px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* STATUS COLORS */
+.status-pending { color: orange; }
+.status-paid { color: green; }
+.status-delivered { color: blue; }
+
+@media print {
+  .print-btn {
+    display: none;
+  }
+
+  .invoice-container {
+    border: none;
+  }
+}

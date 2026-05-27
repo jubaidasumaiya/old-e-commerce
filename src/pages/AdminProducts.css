@@ -1,0 +1,34 @@
+.table-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  gap: 15px;
+}
+
+.product-search-input {
+  padding: 10px 15px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.product-search-input:focus {
+  border-color: #007bff; /* ফোকাস করলে বর্ডার কালার ব্লু হবে */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+/* রেসপনসিভ করার জন্য (মোবাইল স্ক্রিনে নিচে নেমে যাবে) */
+@media (max-width: 600px) {
+  .table-header-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .product-search-input {
+    width: 100%;
+  }
+}

@@ -1,0 +1,14 @@
+.invoice-box {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+@media print {
+  button {
+    display: none;
+  }
+}
