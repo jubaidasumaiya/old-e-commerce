@@ -666,5 +666,5 @@ app.get("/api/my-orders/:email", async (req, res) => {
 });
 
 // 🚀 SERVER PORT
-const PORT = 5001; 
+const PORT = process.env.PORT || 5001; // রেন্ডার তার নিজের পোর্ট পাবে, আর লোকাল পিসিতে ৫০০১ পাবে
 app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
