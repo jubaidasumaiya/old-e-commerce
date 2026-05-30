@@ -176,7 +176,7 @@ app.post("/payment/success", async (req, res) => {
   try {
     const { tran_id } = req.body; 
     await Order.findOneAndUpdate({ trxId: tran_id }, { status: "Paid" });
-    res.redirect(`http://localhost:5173/order-success?tran_id=${tran_id}`);
+    res.redirect(`http://192.168.0.100:5001/order-success?tran_id=${tran_id}`);
   } catch (err) {
     res.status(500).send("Payment success processing failed");
   }

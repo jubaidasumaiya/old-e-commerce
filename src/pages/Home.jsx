@@ -15,11 +15,10 @@ const Home = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        {/* 🎯 স্মার্ট হাইব্রিড ইউআরএল লজিক */}
-        const BACKEND_BASE_URL = import.meta.env.DEV 
-          ? `http://${window.location.hostname}:5001` // লোকাল বা মোবাইলে চললে আইপি ধরবে
-          : "https://your-backend-name.onrender.com"; // ⚠️ এখানে তোমার আসল Render ব্যাকএন্ড লিংকটি বসাবে
-        
+       {/* 🎯 স্মার্ট হাইব্রিড ইউআরএল লজিক */}
+ const BACKEND_BASE_URL = import.meta.env.DEV 
+  ? `http://${window.location.hostname}:5001` // লোকাল বা মোবাইলে চললে আইপি ধরবে
+  : "https://old-e-commerce-4.onrender.com"; // 🚀 এখানে তোমার আসল লাইভ রেন্ডার লিংক বসে গেছে!
         const response = await axios.get(
           `${BACKEND_BASE_URL}/api/products?page=${currentPage}&limit=20&search=${searchTerm}`
         );
