@@ -14,7 +14,7 @@ const AdminCustomers = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/admin/customers", {
+        const res = await axios.get("http://192.168.0.100:5001/admin/customers", {
           headers: { Authorization: token },
         });
         setCustomers(res.data);

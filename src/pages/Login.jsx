@@ -18,7 +18,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5001/api/auth/login", formData);
+      const res = await axios.post("http://192.168.0.100:5001/api/auth/login", formData);
       localStorage.setItem("customerToken", res.data.token);
       localStorage.setItem("customerUser", JSON.stringify(res.data.user));
       alert(res.data.message);

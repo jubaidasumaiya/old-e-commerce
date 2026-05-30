@@ -26,7 +26,7 @@ const CustomerProfile = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.put("http://localhost:5001/api/auth/change-password", {
+      const res = await axios.put("http://192.168.0.100:5001/api/auth/change-password", {
         email: savedUser.email,
         currentPassword,
         newPassword,

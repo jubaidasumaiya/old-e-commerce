@@ -12,7 +12,7 @@ const AdminLogin = () => {
  // 🔐 LOGIN FUNCTION (আপডেট করা হলো)
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:5001/admin/login", {
+      const res = await axios.post("http://192.168.0.100:5001/admin/login", {
         email: email.trim(),
         password: password.trim(),
       });

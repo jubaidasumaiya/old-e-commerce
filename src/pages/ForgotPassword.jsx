@@ -41,7 +41,7 @@ const ForgotPassword = () => {
     if (e) e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5001/api/auth/forgot-password", { email });
+      const res = await axios.post("http://192.168.0.100:5001/api/auth/forgot-password", { email });
       alert(res.data.message);
       setTimeLeft(300); // ⏱️ ওটিপি সফলভাবে গেলে টাইমার আবার ৩০০ সেকেন্ডে রিসেট হবে
       setStep(2);
@@ -64,7 +64,7 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5001/api/auth/reset-password", { email, otp, newPassword });
+      const res = await axios.post("http://192.168.0.100:5001/api/auth/reset-password", { email, otp, newPassword });
       alert(res.data.message);
       navigate("/login");
     } catch (err) {

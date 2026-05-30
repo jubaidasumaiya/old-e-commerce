@@ -23,7 +23,7 @@ const AdminOrders = () => {
   // 📦 FETCH ORDERS
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/orders", {
+      const res = await axios.get("http://192.168.0.100:5001/orders", {
         headers: {
           Authorization: token,
         },
@@ -37,7 +37,7 @@ const AdminOrders = () => {
   // 📊 FETCH SUMMARY
   const fetchSummary = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/admin/summary", {
+      const res = await axios.get("http://192.168.0.100:5001/admin/summary", {
         headers: {
           Authorization: token,
         },
@@ -57,7 +57,7 @@ const AdminOrders = () => {
   const updateStatus = async (id, status) => {
     try {
       await axios.put(
-        `http://localhost:5001/order/${id}/status`,
+        `http://192.168.0.100:5001/order/${id}/status`,
         { status },
         {
           headers: { Authorization: token },
@@ -73,7 +73,7 @@ const AdminOrders = () => {
   // ❌ DELETE ORDER
   const deleteOrder = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/order/${id}`, {
+      await axios.delete(`http://192.168.0.100:5001/order/${id}`, {
         headers: { Authorization: token },
       });
       fetchOrders();
