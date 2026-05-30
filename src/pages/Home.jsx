@@ -79,8 +79,8 @@ const Home = () => {
             products.map((product) => (
               <div className="product-card" key={product.sku}>
                 <div className="product-img-wrapper">
-                  <img src={product.image || "https://via.placeholder.com/150"} alt={product.name} className="product-img" />
-                </div>
+  <img src={product.image || "https://placehold.co/150"} alt={product.name} className="product-img" />
+</div>
                 <h3 title={product.name}>{product.name}</h3>
                 <p className="price">৳{product.price}</p>
                 <p className="stock">{product.stock > 0 ? `Stock: ${product.stock} pcs` : "Out of stock"}</p>

@@ -39,7 +39,7 @@ const Cart = () => {
             return (
               <tr key={itemKey}>
                 <td>
-                  <img src={item.image || "https://via.placeholder.com/150"} alt={item.name} />
+                  <img src={item.image || "https:///placehold.co.com/150"} alt={item.name} />
                   {item.name}
                 </td>
                 <td>৳{item.price}</td>

@@ -43,9 +43,9 @@ const ProductDetails = () => {
       <h2>{product.name}</h2>
       
       <img 
-        src={product.image || "https://via.placeholder.com/150"} 
+        src={product.image || "https:///placehold.co.com/150"} 
         alt={product.name} 
-        onError={(e) => { e.target.src = "https://via.placeholder.com/150"; }}
+        onError={(e) => { e.target.src = "https:///placehold.co.com/150"; }}
       />
       
       <p className="product-price">Price: ৳{product.price}</p>
