@@ -15,8 +15,10 @@ const Home = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        {/* 🎯 ম্যাজিক ট্রিক: ব্রাউজার যে হোস্টে রানিং (Localhost বা IP), ব্যাকএন্ড ইউআরএল অটোমেটিক সেটিই সেট হবে */}
-        const BACKEND_BASE_URL = `http://${window.location.hostname}:5001`;
+        {/* 🎯 স্মার্ট হাইব্রিড ইউআরএল লজিক */}
+        const BACKEND_BASE_URL = import.meta.env.DEV 
+          ? `http://${window.location.hostname}:5001` // লোকাল বা মোবাইলে চললে আইপি ধরবে
+          : "https://your-backend-name.onrender.com"; // ⚠️ এখানে তোমার আসল Render ব্যাকএন্ড লিংকটি বসাবে
         
         const response = await axios.get(
           `${BACKEND_BASE_URL}/api/products?page=${currentPage}&limit=20&search=${searchTerm}`
