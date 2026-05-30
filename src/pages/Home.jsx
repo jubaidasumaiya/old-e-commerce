@@ -8,14 +8,22 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(""); // 🔍 সার্চ ট্র্যাকিং স্টেট
-  const productsPerPage = 20; 
+  const [totalPages, setTotalPages] = useState(1); 
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get("http://localhost:5001/api/products");
-        setProducts(response.data);
+        {/* 🎯 ম্যাজিক ট্রিক: ব্রাউজার যে হোস্টে রানিং (Localhost বা IP), ব্যাকএন্ড ইউআরএল অটোমেটিক সেটিই সেট হবে */}
+        const BACKEND_BASE_URL = `http://${window.location.hostname}:5001`;
+        
+        const response = await axios.get(
+          `${BACKEND_BASE_URL}/api/products?page=${currentPage}&limit=20&search=${searchTerm}`
+        );
+        
+        setProducts(response.data.products);
+        setTotalPages(response.data.totalPages);
       } catch (err) {
         console.error(err);
         setError("Failed to load products.");
@@ -23,23 +31,19 @@ const Home = () => {
         setLoading(false);
       }
     };
-    fetchProducts();
-  }, []);
 
-  if (loading) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading live products...</p>;
-  if (error) return <p style={{ textAlign: "center", marginTop: "50px", color: "red" }}>{error}</p>;
+    const delayDebounceFn = setTimeout(() => {
+      fetchProducts();
+    }, 400); 
 
-  // 🔍 সার্চ লজিক: নাম বা SKU মিললে প্রোডাক্ট দেখাবে
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, searchTerm]); 
 
-  // Pagination logic based on filtered products
-  const indexOfLast = currentPage * productsPerPage;
-  const indexOfFirst = indexOfLast - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage) || 1;
+  if (loading && products.length === 0) 
+    return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading live products...</p>;
+    
+  if (error) 
+    return <p style={{ textAlign: "center", marginTop: "50px", color: "red" }}>{error}</p>;
 
   return (
     <div className="home-container">
@@ -59,28 +63,35 @@ const Home = () => {
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
-              setCurrentPage(1); // সার্চ করলে পেজিনেশন ১ নম্বর পেজে রিসেট হবে
+              setCurrentPage(1); 
             }}
             style={{ width: "80%", maxWidth: "500px", padding: "12px 20px", borderRadius: "25px", border: "2px solid #007bff", fontSize: "1rem", outline: "none" }}
           />
         </div>
 
+        {/* ⏳ সার্চিং লোডার */}
+        {loading && <p style={{ textAlign: "center", color: "#007bff" }}>Searching...</p>}
+
+        {/* 📦 প্রোডাক্ট গ্রিড */}
         <div className="product-grid">
-          {currentProducts.length > 0 ? (
-            currentProducts.map((product) => (
+          {products.length > 0 ? (
+            products.map((product) => (
               <div className="product-card" key={product.sku}>
-                <img src={product.image || "https://via.placeholder.com/150"} alt={product.name} className="product-img" />
+                <div className="product-img-wrapper">
+                  <img src={product.image || "https://via.placeholder.com/150"} alt={product.name} className="product-img" />
+                </div>
                 <h3 title={product.name}>{product.name}</h3>
-                <p>Price: ৳{product.price}</p>
-                <p>Stock: {product.stock > 0 ? `${product.stock} pcs` : "Out of stock"}</p>
+                <p className="price">৳{product.price}</p>
+                <p className="stock">{product.stock > 0 ? `Stock: ${product.stock} pcs` : "Out of stock"}</p>
                 <Link to={`/product/${product.sku}`} className="details-btn">View Details</Link>
               </div>
             ))
           ) : (
-            <p style={{ textAlign: "center", width: "100%", gridColumn: "1/-1", color: "gray" }}>No products found!</p>
+            !loading && <p style={{ textAlign: "center", width: "100%", gridColumn: "1/-1", color: "gray" }}>No products found!</p>
           )}
         </div>
 
+        {/* 📄 PAGINATION BUTTONS */}
         {totalPages > 1 && (
           <div className="pagination">
             <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1}>Previous</button>

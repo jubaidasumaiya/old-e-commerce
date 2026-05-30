@@ -1,34 +1,238 @@
+/* 🌍 Global Font & Box Container Setup */
+.admin-products-container {
+  max-width: 1140px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #f8fafc; /* লাইট প্রিমিয়াম ব্যাকগ্রাউন্ড */
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* 🔝 Top Navigation Box Styling */
+.admin-nav-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 25px;
+}
+
+.admin-nav-box h2 {
+  font-size: 24px;
+  color: #1e293b;
+  margin: 0;
+  font-weight: 700;
+}
+
+.nav-btn {
+  background-color: #475569;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-btn:hover {
+  background-color: #334155;
+  transform: translateY(-1px);
+}
+
+/* ➕ ✍️ Add/Edit Product Form Container */
+.product-form {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 35px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.product-form h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 600;
+  border-left: 4px solid #007bff;
+  padding-left: 10px;
+}
+
+/* 🎛️ Dynamic Input Fields Grid Layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.product-form input,
+.product-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #334155;
+  background-color: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* ফোকাস করলে ইনপুট বর্ডার গ্লো করবে */
+.product-form input:focus,
+.product-form textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  outline: none;
+}
+
+.product-form textarea {
+  resize: vertical;
+  margin-bottom: 20px;
+}
+
+/* 🚀 Form Dynamic Submit Buttons */
+.submit-btn {
+  color: #ffffff;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+  opacity: 0.93;
+  transform: translateY(-1px);
+}
+
+/* 🔍 Table Header Area (Available count + Search bar) */
 .table-header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 30px;
-  margin-bottom: 15px;
+  margin-top: 40px;
+  margin-bottom: 20px;
   gap: 15px;
 }
 
+.table-header-container h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 18px;
+  font-weight: 600;
+}
+
 .product-search-input {
-  padding: 10px 15px;
-  width: 300px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 10px 16px;
+  width: 320px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   font-size: 14px;
+  background-color: #ffffff;
   outline: none;
-  transition: border-color 0.3s;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .product-search-input:focus {
-  border-color: #007bff; /* ফোকাস করলে বর্ডার কালার ব্লু হবে */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-/* রেসপনসিভ করার জন্য (মোবাইল স্ক্রিনে নিচে নেমে যাবে) */
-@media (max-width: 600px) {
+/* 📊 Premium Datatable Styles */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.products-table th {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 14px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.products-table td {
+  padding: 14px 18px;
+  color: #334155;
+  font-size: 14px;
+  border-bottom: 1px solid #edf2f7;
+  vertical-align: middle;
+}
+
+/* টেবিল রো হোভার অ্যানিমেশন */
+.products-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.products-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.products-table td b {
+  color: #0f172a;
+  font-weight: 600;
+  background-color: #f1f5f9;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* ❌ Delete Button Styles */
+.p-delete-btn {
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.p-delete-btn:hover {
+  background-color: #dc2626;
+}
+
+/* 📱 Responsive Screen Tweaks */
+@media (max-width: 768px) {
   .table-header-container {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
   }
+
   .product-search-input {
     width: 100%;
+  }
+
+  .admin-nav-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .products-table {
+    display: block;
+    overflow-x: auto; /* ছোট স্ক্রিনে টেবিল স্ক্রোল করবে */
   }
 }

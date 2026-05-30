@@ -34,3 +34,33 @@
   align-items: center;
   gap: 5px;
 }
+
+.nav-user-name {
+  color: #007bff; /* তোমার থিম কালার অনুযায়ী চেঞ্জ করতে পারো */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.nav-logout-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nav-logout-btn:hover {
+  background-color: #cc0000;
+}
+
+/* লিস্ট আইটেমগুলোর মাঝে এলাইনমেন্ট ঠিক রাখার জন্য */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+}

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // 🎯 useEffect যুক্ত করা হলো
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./Checkout.css";
 
-// 👈 ফিক্স: পোর্ট ৫০০০ থেকে পরিবর্তন করে ৫০০১ করা হলো
-const BACKEND_URL = "http://localhost:5001";
+// ✅ পোর্ট ৫০০১ সেট করা আছে
+const BACKEND_URL = "http://192.168.0.100:5001";
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
@@ -19,14 +19,24 @@ const Checkout = () => {
     paymentMethod: "cod",
   });
 
-  // টোটাল ক্যালকুলেশন লজিক
+  // 🔄 অটো-ফিলাপ লজিক: পেজ ওপেন হলেই লগইন করা ইউজারের নাম ও ইমেইল ফর্মে বসে যাবে
+  useEffect(() => {
+    const storedUser = localStorage.getItem("customerUser");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setForm((prevForm) => ({
+        ...prevForm,
+        name: user.name || "",
+        email: user.email || "", // 📧 আসল লগইন করা ইমেইল সেট হয়ে গেল
+      }));
+    }
+  }, []);
+
+  // ✨ সহজ টোটাল ক্যালকুলেশন লজিক
   const totalAmount = cartItems.reduce((sum, item) => {
-    const itemPrice = item["Selling Price"] || item.price || 0;
-    const cleanPrice = typeof itemPrice === "string" 
-      ? parseFloat(itemPrice.replace(/[^\d.]/g, "")) 
-      : parseFloat(itemPrice);
-      
-    return sum + (cleanPrice || 0) * (item.quantity || 1);
+    const price = Number(item.price || 0);
+    const quantity = Number(item.quantity || 1);
+    return sum + (price * quantity);
   }, 0);
 
   const handleChange = (e) => {
@@ -49,24 +59,18 @@ const Checkout = () => {
 
     setIsProcessing(true);
 
-    // প্রতিটি অর্ডারের জন্য একটি ইউনিক ট্রানজেকশন আইডি তৈরি করা হলো
+    // প্রতিটি অর্ডারের জন্য ইউনিক ট্রানজেকশন আইডি
     const uniqueTrxId = `TXN_${Date.now()}`;
 
+    // 📦 মঙ্গোডিবির নতুন স্কিমা কি (Keys) অনুযায়ী অবজেক্ট তৈরি
     const orderDetails = {
-      customer: { name, email, phone, address },
-      items: cartItems.map((item) => {
-        const itemPrice = item["Selling Price"] || item.price || 0;
-        const cleanPrice = typeof itemPrice === "string"
-          ? parseFloat(itemPrice.replace(/[^\d.]/g, ""))
-          : parseFloat(itemPrice);
-
-        return {
-          sku: item.SKU || item.sku || "N/A",
-          name: item.Product || item.name,
-          price: cleanPrice || 0,
-          quantity: item.quantity || 1,
-        };
-      }),
+      customer: { name, email: email.trim(), phone, address }, // ইমেইল ট্রিম করে পাঠানো হচ্ছে
+      items: cartItems.map((item) => ({
+        sku: item.sku || "N/A",
+        name: item.name || "Unnamed Product",
+        price: Number(item.price || 0),
+        quantity: Number(item.quantity || 1),
+      })),
       totalAmount,
       paymentMethod: paymentMethod === "online" ? "SSLCommerz" : "COD",
       trxId: uniqueTrxId,
@@ -74,7 +78,6 @@ const Checkout = () => {
     };
 
     try {
-      // পেমেন্ট মেথড অনুযায়ী আলাদা এন্ডপয়েন্টে হিট করবে
       const endpoint = paymentMethod === "cod" ? "/cod-order" : "/init";
       
       const res = await fetch(`${BACKEND_URL}${endpoint}`, {
@@ -100,10 +103,11 @@ const Checkout = () => {
 
       if (paymentMethod === "cod") {
         clearCart();
+        // সিওডি অর্ডার সাকসেস হলে কনফার্মেশন পেজে পাঠানো হচ্ছে
         navigate("/order-success", { state: orderDetails });
       } else if (paymentMethod === "online") {
         if (data.url) {
-          // 🚀 এখানে ইউজারকে SSLCommerz-এর অফিশিয়াল পেমেন্ট পেজে রিডাইরেক্ট করা হচ্ছে
+          // 🚀 SSLCommerz পেমেন্ট গেটওয়ে পেজে রিডাইরেক্ট
           window.location.href = data.url;
         } else {
           alert("Payment initiation failed. Try again!");
@@ -125,28 +129,28 @@ const Checkout = () => {
         <h3>🧾 Order Summary</h3>
         {cartItems.length === 0 && <p>Your cart is empty.</p>}
         {cartItems.map((item, idx) => {
-          const itemPrice = item["Selling Price"] || item.price || 0;
-          const cleanPrice = typeof itemPrice === "string"
-            ? parseFloat(itemPrice.replace(/[^\d.]/g, ""))
-            : parseFloat(itemPrice);
+          const price = Number(item.price || 0);
+          const quantity = Number(item.quantity || 1);
 
           return (
             <p key={idx}>
-              {item.Product || item.name} × {item.quantity} = ৳
-              {(cleanPrice || 0) * (item.quantity || 1)}
+              {item.name} × {quantity} = ৳{(price * quantity).toFixed(2)}
             </p>
           );
         })}
-        <h3 className="total">Total: ৳{totalAmount}</h3>
+        <h3 className="total">Total: ৳{totalAmount.toFixed(2)}</h3>
       </div>
 
       <form className="checkout-form" onSubmit={handleOrder}>
+        {/* ইমেইল ইনপুট - লগইন থাকলে এটি অটো ফিলাপ থাকবে এবং রিড-অনলি মোডে থাকবে যাতে ইউজার ভুল না করতে পারে */}
         <input
           type="email"
           name="email"
           placeholder="Email Address"
           value={form.email}
           onChange={handleChange}
+          readOnly={!!localStorage.getItem("customerUser")} // লগইন থাকলে ইমেইল এডিট লক থাকবে
+          style={{ backgroundColor: localStorage.getItem("customerUser") ? "#f1f5f9" : "#fff", cursor: localStorage.getItem("customerUser") ? "not-allowed" : "text" }}
           required
         />
         <input
@@ -213,7 +217,7 @@ const Checkout = () => {
         )}
 
         <button type="submit" className="btn-place-order" disabled={isProcessing}>
-          {isProcessing ? "⏳ Redirecting to Payment..." : "✅ Place Order"}
+          {isProcessing ? "⏳ Redirecting..." : "✅ Place Order"}
         </button>
       </form>
     </div>

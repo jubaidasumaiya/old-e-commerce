@@ -1,0 +1,152 @@
+.my-orders-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.my-orders-container h2 {
+  color: #1e293b;
+  font-size: 26px;
+  margin-bottom: 5px;
+}
+
+.welcome-msg {
+  color: #64748b;
+  margin-bottom: 30px;
+  font-size: 15px;
+}
+
+/* 📦 Order Card Styling */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* 🔝 Card Header */
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 12px;
+  margin-bottom: 15px;
+}
+
+.invoice-no {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.invoice-no span {
+  color: #007bff;
+}
+
+.order-date {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* 🏷️ Dynamic Badges for Customers */
+.cust-status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.cust-status-badge.pending { background-color: #fef3c7; color: #d97706; }
+.cust-status-badge.paid { background-color: #dcfce7; color: #15803d; }
+.cust-status-badge.delivered { background-color: #dbeafe; color: #1d4ed8; }
+.cust-status-badge.failed { background-color: #fee2e2; color: #b91c1c; }
+
+/* 🧾 Card Body (Items List) */
+.order-card-body h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #475569;
+}
+
+.items-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #334155;
+  padding: 6px 0;
+}
+
+.qty-tag {
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+/* 🧾 Card Footer */
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #edf2f7;
+  margin-top: 15px;
+  padding-top: 12px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.order-card-footer p { margin: 0; }
+
+.grand-total {
+  font-size: 15px;
+  color: #1e293b;
+}
+
+.grand-total span {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* 🚫 State Messages */
+.no-orders-box {
+  text-align: center;
+  padding: 40px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+}
+
+.orders-loading, .orders-error {
+  text-align: center;
+  margin-top: 50px;
+  font-weight: 500;
+}
+.orders-error { color: #ef4444; }

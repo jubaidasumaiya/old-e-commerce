@@ -5,7 +5,9 @@ import "./AdminProducts.css";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // 🔍 সার্চ টার্মের জন্য নতুন স্টেট
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [isEditing, setIsEditing] = useState(false); // ✍️ এডিট মোড ট্র্যাক করার জন্য
+  const [editId, setEditId] = useState(null);        // 🆔 যে প্রোডাক্ট এডিট হচ্ছে তার আইডি
   const [formData, setFormData] = useState({
     name: "",
     sku: "",
@@ -39,20 +41,52 @@ const AdminProducts = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ➕ HANDLE ADD PRODUCT
+  // ✍️ TRIGGER EDIT MODE (টেবিলের এডিট বাটনে ক্লিক করলে ফর্ম ফিলাপ হবে)
+  const handleEditClick = (p) => {
+    setIsEditing(true);
+    setEditId(p._id);
+    setFormData({
+      name: p.name,
+      sku: p.sku,
+      price: p.price,
+      description: p.description || "",
+      image: p.image || "",
+      stock: p.stock,
+    });
+    // স্ক্রল করে পেজের ওপরে ফর্মে নিয়ে যাওয়ার জন্য (ঐচ্ছিক)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ❌ CANCEL EDIT MODE
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditId(null);
+    setFormData({ name: "", sku: "", price: "", description: "", image: "", stock: "" });
+  };
+
+  // ➕ / 🔄 HANDLE SUBMIT (ADD OR UPDATE)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5001/admin/product/add", formData, {
-        headers: { Authorization: token },
-      });
-      alert("Product Added Successfully! 🎉");
+      if (isEditing) {
+        // 🔄 প্রোডাক্ট আপডেট করার রিকোয়েস্ট (PUT)
+        await axios.put(`http://localhost:5001/admin/product/${editId}`, formData, {
+          headers: { Authorization: token },
+        });
+        alert("Product Updated Successfully! 🔄");
+      } else {
+        // ➕ নতুন প্রোডাক্ট অ্যাড করার রিকোয়েস্ট (POST)
+        await axios.post("http://localhost:5001/admin/product/add", formData, {
+          headers: { Authorization: token },
+        });
+        alert("Product Added Successfully! 🎉");
+      }
       
-      // ফর্ম খালি করা এবং প্রোডাক্ট লিস্ট রিফ্রেশ করা
-      setFormData({ name: "", sku: "", price: "", description: "", image: "", stock: "" });
+      // স্টেট রিসেট ও রিফ্রেশ
+      handleCancelEdit();
       fetchProducts();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to add product ❌");
+      alert(err.response?.data?.error || "Failed to save product ❌");
     }
   };
 
@@ -70,7 +104,7 @@ const AdminProducts = () => {
     }
   };
 
-  // 🔍 FILTER PRODUCTS LOGIC (Name অথবা SKU দিয়ে ফিল্টার হবে)
+  // 🔍 FILTER PRODUCTS LOGIC
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.sku.toLowerCase().includes(searchTerm.toLowerCase())
@@ -86,29 +120,68 @@ const AdminProducts = () => {
         <h2>🛍️ Product Management</h2>
       </div>
 
-      {/* ➕ ADD PRODUCT FORM */}
-      <form className="product-form" onSubmit={handleSubmit}>
-        <h3>Add New Product</h3>
-        <div className="form-grid">
-          <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} required />
-          <input type="text" name="sku" placeholder="SKU (Unique Code)" value={formData.sku} onChange={handleChange} required />
-          <input type="number" name="price" placeholder="Price (৳)" value={formData.price} onChange={handleChange} required />
-          <input type="number" name="stock" placeholder="Stock Quantity" value={formData.stock} onChange={handleChange} required />
-          <input type="text" name="image" placeholder="Image URL (e.g., /images/product.jpg)" value={formData.image} onChange={handleChange} />
-        </div>
-        <textarea name="description" placeholder="Product Description..." value={formData.description} onChange={handleChange} rows="3"></textarea>
-        <button type="submit" className="submit-btn">Upload Product 🚀</button>
-      </form>
+      {/* ➕ / ✍️ DYNAMIC FORM */}
+<form className="product-form" onSubmit={handleSubmit}>
+  <h3>{isEditing ? "✍️ Edit Product Details" : "Add New Product"}</h3>
+  
+  <div className="form-grid">
+    {/* প্রোডাক্ট নাম */}
+    <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      <label style={{ fontWeight: "bold", fontSize: "14px", color: "#475569", textAlign: "left" }}>Product Name:</label>
+      <input type="text" name="name" placeholder="Product Name" value={formData.name} onChange={handleChange} required />
+    </div>
+
+    {/* এসকেইউ কোড */}
+    <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      <label style={{ fontWeight: "bold", fontSize: "14px", color: "#475569", textAlign: "left" }}>SKU (Unique Code):</label>
+      <input type="text" name="sku" placeholder="SKU (Unique Code)" value={formData.sku} onChange={handleChange} required />
+    </div>
+
+    {/* প্রোডাক্টের দাম */}
+    <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      <label style={{ fontWeight: "bold", fontSize: "14px", color: "#475569", textAlign: "left" }}>Price (৳):</label>
+      <input type="number" name="price" placeholder="Price (৳)" value={formData.price} onChange={handleChange} required />
+    </div>
+
+    {/* স্টক পরিমাণ */}
+    <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      <label style={{ fontWeight: "bold", fontSize: "14px", color: "#475569", textAlign: "left" }}>Stock Quantity:</label>
+      <input type="number" name="stock" placeholder="Stock Quantity" value={formData.stock} onChange={handleChange} required />
+    </div>
+
+    {/* ইমেজের লিংক */}
+    <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+      <label style={{ fontWeight: "bold", fontSize: "14px", color: "#475569", textAlign: "left" }}>Image URL:</label>
+      <input type="text" name="image" placeholder="Image URL (e.g., /images/product.jpg)" value={formData.image} onChange={handleChange} />
+    </div>
+  </div>
+
+  {/* ডেসক্রিপশন বা বিবরণ */}
+  <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "5px", marginTop: "15px" }}>
+    <label style={{ fontWeight: "bold", fontSize: "14px", color: "#475569", textAlign: "left" }}>Product Description:</label>
+    <textarea name="description" placeholder="Product Description..." value={formData.description} onChange={handleChange} rows="3"></textarea>
+  </div>
+  
+  <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+    <button type="submit" className="submit-btn" style={{ background: isEditing ? "#28a745" : "#007bff" }}>
+      {isEditing ? "Update Product 🔄" : "Upload Product 🚀"}
+    </button>
+    
+    {isEditing && (
+      <button type="button" onClick={handleCancelEdit} className="submit-btn" style={{ background: "#6c757d" }}>
+        Cancel Edit ❌
+      </button>
+    )}
+  </div>
+</form>
 
       {/* 📊 PRODUCTS TABLE HEADER & SEARCH BAR */}
       <div className="table-header-container">
         <h3>📦 Available Products ({filteredProducts.length})</h3>
-        
-        {/* 🔍 SEARCH INPUT FIELD */}
         <input
           type="text"
           className="product-search-input"
-          placeholder="Name বা SKU দিয়ে সার্চ করুন..."
+          placeholder="Name বা SKU দিয়ে সার্চ করুন..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -134,6 +207,14 @@ const AdminProducts = () => {
                 <td>৳{p.price}</td>
                 <td>{p.stock} pcs</td>
                 <td>
+                  {/* ✍️ এডিট বাটন */}
+                  <button 
+                    onClick={() => handleEditClick(p)}
+                    style={{ background: "#ffc107", color: "#212529", border: "none", padding: "5px 10px", borderRadius: "4px", cursor: "pointer", marginRight: "5px", fontWeight: "bold" }}
+                  >
+                    Edit ✍️
+                  </button>
+
                   <button className="p-delete-btn" onClick={() => handleDelete(p._id)}>
                     Delete ❌
                   </button>
@@ -143,7 +224,7 @@ const AdminProducts = () => {
           ) : (
             <tr>
               <td colSpan="5" style={{ textAlign: "center", padding: "20px", color: "#888" }}>
-                কোনো প্রোডাক্ট খুঁজে পাওয়া যায়নি! ⚠️
+                কোনো প্রোডাক্ট খুঁজে পাওয়া যায়নি! ⚠️
               </td>
             </tr>
           )}

@@ -5,6 +5,8 @@ const SSLCommerzPayment = require("sslcommerz-lts");
 const jwt = require("jsonwebtoken"); 
 require("dotenv").config();
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
 
 const app = express();
 const JWT_SECRET = "mySuperSecretAdminKey123"; 
@@ -61,6 +63,17 @@ const productSchema = new mongoose.Schema(
 );
 const Product = mongoose.model("Product", productSchema);
 
+// 👤 নতুন যুক্ত করা হলো: Customer User Schema
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true }, 
+  },
+  { timestamps: true }
+);
+const User = mongoose.model("User", userSchema);
+
 // 🔐 JWT ভেরিফিকেশন মিডলওয়্যার
 const verifyAdminToken = (req, res, next) => {
   const token = req.headers["authorization"];
@@ -91,7 +104,7 @@ app.post("/admin/login", async (req, res) => {
   }
 });
 
-// ✅ ২. SSLCOMMERZ PAYMENT INITIALIZATION (অটো ইনভয়েস সহ)
+// ✅ ২. SSLCOMMERZ PAYMENT INITIALIZATION
 app.post("/init", async (req, res) => {
   try {
     const store_id = "compl6909d09f73645"; 
@@ -290,7 +303,7 @@ app.delete("/admin/product/:id", verifyAdminToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to delete product" });
   }
-});
+}); // 👈 ভুল বাতিটি এখান থেকে সরানো হয়েছে
 
 // ✅ ১১. UPDATE ORDER STATUS
 app.put("/order/:id/status", verifyAdminToken, async (req, res) => {
@@ -303,11 +316,36 @@ app.put("/order/:id/status", verifyAdminToken, async (req, res) => {
   }
 });
 
-// 🌍 PUBLIC ROUTE: FETCH ALL PRODUCTS FOR CUSTOMERS
+// 🌍 🔄 অপ্টিমাইজড পাবলিক রুট: FETCH PRODUCTS WITH PAGINATION
 app.get("/api/products", async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 }); 
-    res.json(products);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20; 
+    const search = req.query.search || "";
+    const skip = (page - 1) * limit;
+
+    const searchQuery = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { sku: { $regex: search, $options: "i" } }
+          ]
+        }
+      : {};
+
+    const products = await Product.find(searchQuery)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalProducts = await Product.countDocuments(searchQuery);
+
+    res.json({
+      products,
+      currentPage: page,
+      totalPages: Math.ceil(totalProducts / limit) || 1,
+      totalProducts
+    });
   } catch (err) {
     console.error("Public Fetch Products Error:", err);
     res.status(500).json({ error: "Failed to fetch products" });
@@ -323,28 +361,23 @@ app.delete("/order/:id", verifyAdminToken, async (req, res) => {
     res.status(500).json({ error: "Failed to delete order" });
   }
 });
-// 📥 ১৩. BULK IMPORT PRODUCTS (GET Method & Exact Path Match)
-// ব্রাউজারে সরাসরি http://localhost:5001/admin/import-all-json-products লিখে এন্টার দিলেই এটি কাজ করবে।
+
+// 📥 ১৩. BULK IMPORT PRODUCTS
 app.get("/admin/import-all-json-products", async (req, res) => {
   try {
-    // ১. চেক করা ব্যাকএন্ড ফোল্ডারে products.json ফাইলটি আছে কিনা
     if (!fs.existsSync("products.json")) {
-      return res.status(404).send("❌ ব্যাকএন্ড ফোল্ডারে 'products.json' নামে কোনো ফাইল খুঁজে পাওয়া যায়নি! ফাইলটি আগে রাখুন।");
+      return res.status(404).send("❌ ব্যাকএন্ড ফোল্ডারে 'products.json' নামে কোনো ফাইল খুঁজে পাওয়া যায়নি!");
     }
 
-    // ২. ফাইল রিড করা
     const rawData = fs.readFileSync("products.json", "utf8");
     const oldProducts = JSON.parse(rawData);
     
-    // ৩. JSON ফাইলের ডুপ্লিকেট SKU ফিল্টার করা
     const uniqueMap = new Map(oldProducts.map(item => [item.SKU || item.sku, item]));
     const uniqueOldProducts = Array.from(uniqueMap.values());
 
-    // ৪. ডাটাবেজে আগে থেকে কোন কোন SKU আছে তা চেক করা
     const existingProducts = await Product.find({}, { sku: 1 });
     const existingSkus = new Set(existingProducts.map(p => p.sku));
 
-    // ৫. ডাটাবেজের সাথে মিলিয়ে শুধুমাত্র নতুন প্রোডাক্টগুলো আলাদা করা
     const formattedProducts = [];
     uniqueOldProducts.forEach((item) => {
       const skuStr = String(item.SKU || item.sku || "").trim();
@@ -361,20 +394,277 @@ app.get("/admin/import-all-json-products", async (req, res) => {
       }
     });
 
-    // কোনো নতুন প্রোডাক্ট না থাকলে
     if (formattedProducts.length === 0) {
       return res.send("ℹ️ No new unique products to import. All unique products are already in the database!");
     }
 
-    // ৬. ডাটাবেজে একসাথে ইনসার্ট করা
     await Product.insertMany(formattedProducts, { ordered: false });
-
     res.send(`🎉 Success! ${formattedProducts.length} new products imported to MongoDB successfully!`);
   } catch (err) {
     console.error("Bulk Import Error:", err);
     res.status(500).send("Failed to import products: " + err.message);
   }
 });
+
+// 📑 ১৪. FETCH ALL CUSTOMERS FOR ADMIN
+app.get("/admin/customers", verifyAdminToken, async (req, res) => {
+  try {
+    const customers = await User.find({}, { password: 0 }).sort({ createdAt: -1 });
+    res.json(customers);
+  } catch (err) {
+    console.error("Fetch Customers Error:", err);
+    res.status(500).json({ error: "Failed to fetch registered customers" });
+  }
+});
+
+// 🔄 ১৫. UPDATE PRODUCT DETAILS (প্রোডাক্টের দাম, স্টক বা তথ্য এডিট করার জন্য)
+app.put("/admin/product/:id", verifyAdminToken, async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true } // এটি ডাটাবেজে আপডেট হওয়া নতুন ডেটাটি রিটার্ন করবে
+    );
+    if (!updatedProduct) return res.status(404).json({ error: "Product not found" });
+    
+    res.json({ success: true, message: "Product updated successfully!", product: updatedProduct });
+  } catch (err) {
+    console.error("Update Product Error:", err);
+    res.status(500).json({ error: "Failed to update product" });
+  }
+});
+
+// 🌍 PUBLIC ROUTE: FETCH SINGLE PRODUCT BY ANY IDENTIFIER
+app.get("/api/product/:identifier", async (req, res) => {
+  try {
+    const { identifier } = req.params;
+    let product = null;
+
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+      product = await Product.findById(identifier);
+    }
+
+    if (!product) {
+      product = await Product.findOne({ sku: identifier });
+    }
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found ❌" });
+    }
+
+    res.json(product);
+  } catch (err) {
+    console.error("Fetch Product Details Error:", err);
+    res.status(500).json({ error: "Failed to fetch product details" });
+  }
+});
+
+// 🌍 SMART PUBLIC ROUTE: ID অথবা SKU যেকোনো একটি দিয়ে প্রোডাক্ট খুঁজবে
+app.get("/api/product/sku/:sku", async (req, res) => {
+  try {
+    const param = req.params.sku;
+    let product = null;
+
+    if (mongoose.Types.ObjectId.isValid(param)) {
+      product = await Product.findById(param);
+    }
+
+    if (!product) {
+      product = await Product.findOne({ 
+        sku: { $regex: new RegExp("^" + param.trim() + "$", "i") } 
+      });
+    }
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json(product);
+  } catch (err) {
+    console.error("Fetch Product Error:", err);
+    res.status(500).json({ error: "Failed to fetch product details" });
+  }
+});
+
+// ✉️ ইমেইল পাঠানোর কনফিগারেশন (Gmail SMTP)
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "complexbd5@gmail.com", // ⚠️ তোমার আসল জিমেইল এখানে দাও
+    pass: "wxfg ldiw kouu zfzi",    // ⚠️ জিমেইলের App Password এখানে দিতে হবে
+  },
+});
+
+// মেমোরিতে সাময়িকভাবে OTP সেভ রাখার জন্য একটি অবজেক্ট (প্রজেক্ট সহজ রাখার জন্য)
+let otpStore = {}; 
+
+// 1️⃣ FORGOT PASSWORD: ওটিপি জেনারেট ও ইমেইল পাঠানো
+app.post("/api/auth/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    // ✅ বদলে এভাবে লেখো (যদি তোমার মডেলের নাম Customer হয়):
+    // 🔄 বদল করে আবার এটি লেখো:
+const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({ error: "No account found with this email! ❌" });
+    }
+
+    // ৬ ডিজিটের র্যান্ডম ওটিপি তৈরি
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // ওটিপিটি ৫ মিনিটের জন্য মেমোরিতে সেভ রাখা হলো
+    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+
+    // কাস্টমারের ইমেইলে ওটিপি পাঠানো
+    const mailOptions = {
+      from: 'complexbd5@gmail.com',
+      to: email,
+      subject: "Password Reset OTP - Complex Solution BD",
+      text: `Your 6-digit password reset OTP is: ${otp}. It will expire in 5 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "A 6-digit OTP has been sent to your email! 📩" });
+
+  } catch (err) {
+    console.error("Forgot Password Error:", err);
+    res.status(500).json({ error: "Failed to send OTP email" });
+  }
+});
+
+// 2️⃣ RESET PASSWORD: ওটিপি ম্যাচ করে নতুন পাসওয়ার্ড সেট করা
+app.post("/api/auth/reset-password", async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    // ওটিপি চেক করা
+    const record = otpStore[email];
+    if (!record || record.otp !== otp || record.expires < Date.now()) {
+      return res.status(400).json({ error: "Invalid or expired OTP! ❌" });
+    }
+
+    // পাসওয়ার্ড হ্যাশ করা
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // ডাটাবেজে আপডেট করা
+    await User.findOneAndUpdate({ email }, { password: hashedPassword });
+
+    // কাজ শেষ হলে ওটিপি মেমোরি থেকে ডিলিট করে দেওয়া
+    delete otpStore[email];
+
+    res.json({ message: "Password reset successfully! Log in with your new password. 🎉" });
+  } catch (err) {
+    console.error("Reset Password Error:", err);
+    res.status(500).json({ error: "Failed to reset password" });
+  }
+});
+
+// 👤 📝 CUSTOMER SIGNUP ROUTE (পাসওয়ার্ড হ্যাশ করে সেভ করবে)
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "এই ইমেইল দিয়ে অলরেডি অ্যাকাউন্ট খোলা আছে! ⚠️" });
+    }
+
+    // 🔐 রেজিস্ট্রেশনের সময়ই পাসওয়ার্ড হ্যাশ (Encrypt) করা হলো
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save();
+
+    res.json({ success: true, message: "অ্যাকাউন্ট তৈরি সফল হয়েছে! 🎉" });
+  } catch (err) {
+    console.error("Signup Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+//👤 🔑 CUSTOMER LOGIN ROUTE (bcrypt দিয়ে ম্যাচ করবে)
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // ১. ইমেইল দিয়ে ইউজার খোঁজা
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ error: "ভুল ইমেইল অথবা পাসওয়ার্ড! ❌" });
+    }
+
+    // 🔐 ২. bcrypt.compare দিয়ে ডাটাবেজের হ্যাশ পাসওয়ার্ডের সাথে মেলানো হলো
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "ভুল ইমেইল অথবা পাসওয়ার্ড! ❌" });
+    }
+
+    const token = jwt.sign({ id: user._id, role: "customer" }, JWT_SECRET, { expiresIn: "7d" });
+
+    res.json({
+      success: true,
+      message: "লগইন সফল হয়েছে! 👋",
+      token,
+      user: { id: user._id, name: user.name, email: user.email }
+    });
+  } catch (err) {
+    console.error("Login Error:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// 🔐 CUSTOMER: পাসওয়ার্ড পরিবর্তন করার এপিআই
+app.put("/api/auth/change-password", async (req, res) => {
+  try {
+    const { email, currentPassword, newPassword } = req.body;
+
+    // ১. কাস্টমারকে ডাটাবেজে খোঁজা
+    const user = await User.findOne({ email }); // তোমার মডেলের নাম User বা Customer যা আছে তা লিখবে
+    if (!user) {
+      return res.status(404).json({ error: "User not found ❌" });
+    }
+
+    // ২. পুরোনো পাসওয়ার্ড ম্যাচ করে কি না তা চেক করা (bcrypt দিয়ে)
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Current password is incorrect! ❌" });
+    }
+
+    // ৩. নতুন পাসওয়ার্ডটি হ্যাশ (Encrypt) করা
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // ৪. ডাটাবেজে নতুন পাসওয়ার্ড সেভ করা
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password updated successfully! 🎉" });
+  } catch (err) {
+    console.error("Change Password Error:", err);
+    res.status(500).json({ error: "Server error, failed to change password" });
+  }
+});
+
+
+
+// 🌍 অপ্টিমাইজড রুট: বড়/ছোট হাতের অক্ষরের অমিল থাকলেও অর্ডার খুঁজে বের করবে
+app.get("/api/my-orders/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    
+    const orders = await Order.find({ 
+      "customer.email": { $regex: new RegExp("^" + email.trim() + "$", "i") } 
+    }).sort({ createdAt: -1 });
+    
+    res.json(orders);
+  } catch (err) {
+    console.error("Fetch Customer Orders Error:", err);
+    res.status(500).json({ error: "Failed to fetch order history" });
+  }
+});
+
 // 🚀 SERVER PORT
 const PORT = 5001; 
 app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));

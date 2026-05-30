@@ -5,12 +5,16 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
+  // ➕ ADD TO CART (ছোট ও বড় হাতের SKU হ্যান্ডেল করা হয়েছে)
   const addToCart = (product, quantity) => {
-    const exist = cartItems.find((item) => item.SKU === product.SKU);
+    const productSku = product.sku || product.SKU; // যেকোনো একটি পেলেই নিবে
+    
+    const exist = cartItems.find((item) => (item.sku || item.SKU) === productSku);
+    
     if (exist) {
       setCartItems(
         cartItems.map((item) =>
-          item.SKU === product.SKU
+          (item.sku || item.SKU) === productSku
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
@@ -20,14 +24,19 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // ❌ REMOVE FROM CART
   const removeFromCart = (sku) => {
-    setCartItems(cartItems.filter((item) => item.SKU !== sku));
+    setCartItems(cartItems.filter((item) => (item.sku || item.SKU) !== sku));
   };
 
+  // 🔄 UPDATE QUANTITY FIX (এখানেই আসল সমস্যা ছিল)
   const updateQuantity = (sku, quantity) => {
     setCartItems(
       cartItems.map((item) =>
-        item.SKU === sku ? { ...item, quantity: Number(quantity) } : item
+        // ডাইনামিক্যালি চেক করবে যাতে ম্যাচিং মিস না হয়
+        (item.sku || item.SKU) === sku 
+          ? { ...item, quantity: Number(quantity) } 
+          : item
       )
     );
   };

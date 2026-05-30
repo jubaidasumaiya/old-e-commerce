@@ -1,75 +1,178 @@
-.products-section {
-  padding: 20px;
+/* 🌍 গ্লোবাল ও কন্টেইনার স্টাইল */
+.home-container {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8fafc;
+  min-height: 100vh;
 }
 
-/* ফিক্স ১: গ্রিডের নিচে মার্জিন দেওয়া হলো যাতে নিচের বাটনগুলো লেগে না যায় */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 columns */
-  gap: 20px; /* spacing between cards */
-  margin-bottom: 40px; /* ফিক্স: প্রোডাক্ট বক্স থেকে নিচের বাটনের দূরত্ব তৈরি করবে */
-}
-
-/* ফিক্স ২: বক্সের উচ্চতা যাতে অতিরিক্ত বড় না হয় তা নিয়ন্ত্রণ করা হলো */
-.product-card {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 15px;
+/* 🚀 হিরো ব্যানার সেকশন */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
   text-align: center;
-  border-radius: 8px;
-  
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* কন্টেন্টগুলোকে সমানভাবে উপর-নিচে ভাগ করে দেবে */
-  min-height: 320px; /* ফিক্স: বক্সের একটা স্ট্যান্ডার্ড সর্বনিম্ন উচ্চতা (আপনার পছন্দমত পরিবর্তন করতে পারেন) */
-  height: auto;      /* ফিক্স: অতিরিক্ত বড় হয়ে টেনে লম্বা হবে না */
+  padding: 60px 20px;
 }
-
-.product-card img {
-  width: 100%;
-  height: 150px; /* fixed height for all images */
-  object-fit: contain;
+.hero h1 {
+  font-size: 2.5rem;
   margin-bottom: 10px;
 }
+.hero .highlight {
+  color: #fbbf24;
+}
 
-/* ফিক্স ৩: বাটনটিকে কার্ডের বর্ডারের সাথে সামঞ্জস্যপূর্ণ করা হলো */
+/* 🛍️ প্রোডাক্ট সেকশন */
+.products-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.products-section h2 {
+  font-size: 1.8rem;
+  color: #1e293b;
+  margin-bottom: 25px;
+  border-left: 5px solid #007bff;
+  padding-left: 10px;
+}
+
+/* 🖥️ ডেস্কটপের জন্য ৪ কলাম বিশিষ্ট প্রোডাক্ট গ্রিড */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* 📦 প্রোডাক্ট কার্ড ডিজাইন (বক্স ইলাস্টিক হওয়া বন্ধ করবে) */
+.product-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* 🖼️ ইমেজ কন্টেইনার ফিক্স */
+.product-img-wrapper {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f1f5f9;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ইমেজ চ্যাপ্টা হবে না */
+}
+
+/* 📝 কার্ড টেক্সট ও টাইটেল */
+.product-card h3 {
+  font-size: 1rem;
+  color: #334155;
+  margin: 0 0 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* নাম বেশি বড় হলে ২ লাইন পর ডট ডট (...) আসবে */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.4rem; /* হাইট ফিক্সড, তাই বক্স সব সমান থাকবে */
+}
+.product-card .price {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #0284c7;
+  margin: 5px 0;
+}
+.product-card .stock {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+/* 🔘 ভিউ ডিটেইলস বাটন */
 .details-btn {
-  display: block;      /* inline-block থেকে block করা হলো */
-  margin-top: 15px;    /* auto-র বদলে একটি নির্দিষ্ট সুন্দর মার্জিন দেওয়া হলো */
-  padding: 8px 10px;
-  background-color: #007bff;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-.details-btn:hover {
-  background-color: #0056b3;
-}
-
-/* প্যাগিনেশন সেকশন */
-.pagination {
-  margin-top: 20px;
+  display: block;
   text-align: center;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.details-btn:hover {
+  background: #0056b3;
 }
 
+/* 📄 পেজিনেশন স্টাইল */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 40px;
+}
 .pagination button {
-  padding: 8px 16px; /* বাটনগুলো দেখতে একটু বড় ও সুন্দর করা হলো */
-  margin: 0 5px;
-  border: none;
-  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
-  background-color: #007bff;
-  color: #fff;
-  transition: background-color 0.2s;
 }
-
-.pagination button:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
 .pagination button:disabled {
-  background-color: #ccc;
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ======================================================= */
+/* 📱 ম্যার্জিক মিডিয়া কুয়েরি: মোবাইল এবং ট্যাবলেটের জন্য ফিক্স */
+/* ======================================================= */
+@media (max-width: 1024px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr); /* ট্যাবলেটে ৩টা দেখাবে */
+  }
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+  .products-section {
+    margin: 20px auto;
+    padding: 0 10px;
+  }
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr); /* 🎯 মোবাইলে দারাজের মতো পাশাপাশি ২টি বক্স থাকবে */
+    gap: 10px; /* মোবাইল স্ক্রিনের জন্য গ্যাপ কম */
+  }
+  .product-card {
+    padding: 10px;
+    border-radius: 8px;
+  }
+  .product-img-wrapper {
+    height: 130px; /* মোবাইলে ইমেজ বক্সের সাইজ ছোট করা হলো */
+  }
+  .product-card h3 {
+    font-size: 0.9rem;
+    height: 2.2rem;
+  }
+  .product-card .price {
+    font-size: 1rem;
+  }
+  .details-btn {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
 }

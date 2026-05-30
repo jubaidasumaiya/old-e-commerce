@@ -1,129 +1,30 @@
-/* Cart.css */
-
-.cart-container {
-  max-width: 1000px;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  font-family: 'Poppins', sans-serif;
-}
-
-.cart-container h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 30px;
-}
-
-thead {
-  background-color: #007bff;
-  color: #fff;
-}
-
-th, td {
-  padding: 12px 15px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
-}
-
-td img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-right: 10px;
-}
-
-input[type="number"] {
-  width: 60px;
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  text-align: center;
-  background-color: #f0f0f0;
-  transition: 0.3s;
-}
-
-input[type="number"]:focus {
-  outline: none;
-  border-color: #007bff;
-  background-color: #fff;
-}
-
-button {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-.btn-remove {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.btn-checkout {
-  background-color: #28a745;
-  color: #fff;
-  margin-right: 10px;
-}
-
-.btn-clear {
-  background-color: #ffc107;
-  color: #fff;
-}
-
-.cart-actions {
+/* 🎛️ QUANTITY CONTROL STYLING (HIGH CONTRAST FIX) */
+.quantity-control {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-@media (max-width: 768px) {
-  table, thead, tbody, th, td, tr {
-    display: block;
-  }
+/* প্লাস এবং মাইনাস বাটনের কালার ও সাইজ একদম স্পষ্ট করার জন্য */
+.btn-qty {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  background-color: #007bff !important; /* 🔵 ব্যাকগ্রাউন্ড হবে সুন্দর উজ্জ্বল নীল */
+  color: #ffffff !important;            /* ⚪ ভেতরের + এবং - চিহ্ন হবে ধবধবে সাদা */
+  border: none !important;
+  border-radius: 6px !important;
+  font-size: 18px !important;          /* সাইজ একটু বড় করা হলো যাতে স্পষ্ট দেখা যায় */
+  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
 
-  thead tr {
-    display: none;
-  }
-
-  tr {
-    margin-bottom: 20px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-  }
-
-  td {
-    text-align: right;
-    padding-left: 50%;
-    position: relative;
-  }
-
-  td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 15px;
-    width: 45%;
-    text-align: left;
-    font-weight: 600;
-  }
-
-  td img {
-    margin-right: 0;
-    margin-bottom: 10px;
-  }
+/* মাউস নিলে যেন কালার চেঞ্জ হয় */
+.btn-qty:hover {
+  background-color: #0056b3 !important; /* হোভার করলে নীল কালারটি আরেকটু গাঢ় হবে */
 }
