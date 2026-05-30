@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react"; // 🎯 useEffect যুক্ত করা হলো
+import React, { useEffect, useState } from "react"; // 🎯 useEffect যুক্ত করা হলো
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import "./Checkout.css";
 
-// ✅ পোর্ট ৫০০১ সেট করা আছে
-const BACKEND_URL = "http://192.168.0.100:5001";
+// 🎯 স্মার্ট হাইব্রিড ইউআরএল লজিক (লোকাল ওয়াইফাইতেও চলবে, নেটলিফাই লাইভেও চলবে)
+const BACKEND_URL = import.meta.env.DEV 
+  ? `http://${window.location.hostname}:5001` 
+  : "https://old-e-commerce-4.onrender.com";
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
@@ -27,7 +29,7 @@ const Checkout = () => {
       setForm((prevForm) => ({
         ...prevForm,
         name: user.name || "",
-        email: user.email || "", // 📧 আসল লগইন করা ইমেইল সেট হয়ে গেল
+        email: user.email || "", // 📧 আসল লগইন করা ইমেইল সেট হয়ে গেল
       }));
     }
   }, []);
@@ -103,7 +105,7 @@ const Checkout = () => {
 
       if (paymentMethod === "cod") {
         clearCart();
-        // সিওডি অর্ডার সাকসেস হলে কনফার্মেশন পেজে পাঠানো হচ্ছে
+        // সিઓডি অর্ডার সাকসেস হলে কনফার্মেশন পেজে পাঠানো হচ্ছে
         navigate("/order-success", { state: orderDetails });
       } else if (paymentMethod === "online") {
         if (data.url) {
@@ -142,7 +144,7 @@ const Checkout = () => {
       </div>
 
       <form className="checkout-form" onSubmit={handleOrder}>
-        {/* ইমেইল ইনপুট - লগইন থাকলে এটি অটো ফিলাপ থাকবে এবং রিড-অনলি মোডে থাকবে যাতে ইউজার ভুল না করতে পারে */}
+        {/* ইমেইল ইনপুট - লগইন থাকলে এটি অটো ফিলাপ থাকবে এবং রিড-অনলি মোডে থাকবে */}
         <input
           type="email"
           name="email"
