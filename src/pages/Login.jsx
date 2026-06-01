@@ -4,6 +4,11 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👁️ আইকন ইম্পোর্ট করা হলো
 import "./Auth.css";
 
+// 🎯 এই লাইনটি মিসিং ছিল! (ডায়নামিক ইউআরএল লজিক)
+const BACKEND_BASE_URL = import.meta.env.DEV 
+  ? `http://${window.location.hostname}:5001` 
+  : "https://old-e-commerce-4.onrender.com";
+
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -36,7 +41,6 @@ const Login = () => {
       <div className="auth-card">
         <h2>Welcome Back! 👋</h2>
 
-
         <form onSubmit={handleLogin}>
           
           {/* ইমেইল এড্রেস */}
@@ -45,7 +49,7 @@ const Login = () => {
             <input type="email" name="email" placeholder="Enter email" value={formData.email} onChange={handleChange} required />
           </div>
           
-          {/* পাসওয়ার্ড এবং ফরগট লিংক */}
+          {/* পাসওয়ার্ড এবং ফরগট লিংক */}
           <div className="form-group">
             <label>Password</label>
             <div className="password-wrapper">
@@ -62,7 +66,7 @@ const Login = () => {
               </span>
             </div>
 
-            {/* 🔗 নতুন সিএসএস ক্লাস সহ ফরগট পাসওয়ার্ড লিংক */}
+            {/* 🔗 নতুন সিএসএস ক্লাস সহ ফরগট পাসওয়ার্ড লিংক */}
             <Link to="/forgot-password" className="forgot-link">
               Forgot Password?
             </Link>

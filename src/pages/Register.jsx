@@ -4,10 +4,15 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👁️ আইকন ইম্পোর্ট করা হলো
 import "./Auth.css";
 
+// 🎯 ডায়নামিক ইউআরএল লজিক (লোকাল এবং লাইভ রেন্ডার সার্ভার হ্যান্ডেল করবে)
+const BACKEND_BASE_URL = import.meta.env.DEV 
+  ? `http://${window.location.hostname}:5001` 
+  : "https://old-e-commerce-4.onrender.com";
+
 const Register = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👈 পাসওয়ার্ড দেখানোর স্টেট
+  const [showPassword, setShowPassword] = useState(false); // 👈 পাসওয়ার্ড দেখানোর স্টেট
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,7 +23,8 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://192.168.0.100:5001/api/auth/register", formData);
+      // 🎯 এখানে এখন ডায়নামিক ইউআরএল ব্যবহার করা হয়েছে
+      const res = await axios.post(`${BACKEND_BASE_URL}/api/auth/register`, formData);
       alert(res.data.message);
       navigate("/login");
     } catch (err) {
@@ -44,10 +50,10 @@ const Register = () => {
           
           <div className="form-group">
             <label>Password</label>
-            {/* 👁️ পাসওয়ার্ড ইনপুট র‍্যাপার */}
+            {/* 👁️ পাসওয়ার্ড ইনপুট র‍্যাপার */}
             <div className="password-wrapper">
               <input 
-                type={showPassword ? "text" : "password"} // 👈 স্টেট অনুযায়ী টাইপ চেঞ্জ হবে
+                type={showPassword ? "text" : "password"} // 👈 স্টেট অনুযায়ী টাইপ চেঞ্জ হবে
                 name="password" 
                 placeholder="Create a password" 
                 value={formData.password} 

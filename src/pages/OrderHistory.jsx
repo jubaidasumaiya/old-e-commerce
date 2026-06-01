@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
 import "./OrderHistory.css";
 
+// 🎯 ডায়নামিক ইউআরএল লজিক (লোকাল এবং লাইভ রেন্ডার সার্ভার হ্যান্ডেল করবে)
+const BACKEND_BASE_URL = import.meta.env.DEV 
+  ? `http://${window.location.hostname}:5001` 
+  : "https://old-e-commerce-4.onrender.com";
+
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    const BACKEND_URL = "https://vitejsvitenabmb9fe-plm4--5173--cf284e50.local-credentialless.webcontainer.io";
-    fetch(`https://vitejsvitenabmb9fe-plm4--5173--cf284e50.local-credentialless.webcontainer.io/orders`)
+    // 🎯 পুরোনো হার্ডকোডেড লিংক ফেলে এখানে ডায়নামিক ইউআরএল বসানো হলো
+    fetch(`${BACKEND_BASE_URL}/orders`) 
       .then((res) => res.json())
       .then((data) => setOrders(data))
       .catch((err) => console.error(err));
