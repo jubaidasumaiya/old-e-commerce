@@ -16,9 +16,13 @@ import AdminProducts from "./pages/AdminProducts";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminCustomers from "./pages/AdminCustomers";
-import MyOrders from "./pages/MyOrders"; // 🎯 আমাদের আসল ফিক্স করা পেজ
+import MyOrders from "./pages/MyOrders"; 
 import CustomerProfile from "./pages/CustomerProfile";
 import ForgotPassword from "./pages/ForgotPassword";
+import AdminInbox from "./pages/AdminInbox";
+
+// ➕ ১. ওপরে চ্যাট কম্পোনেন্টটি ইমপোর্ট করো
+import Chat from "./components/Chat"; 
 
 function App() {
   return (
@@ -35,6 +39,15 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          <Route 
+  path="/admin/inbox" 
+  element = {
+    <ProtectedRoute>
+      <AdminInbox />
+    </ProtectedRoute>
+  } 
+/>
           
           {/* 👤 কাস্টমারের নিজস্ব রুট (লগইন করা ইউজারদের জন্য) */}
           <Route path="/my-orders" element={<MyOrders />} /> 
@@ -81,6 +94,12 @@ function App() {
             } 
           />
         </Routes>
+
+        {/* ➕ ২. এখানে চ্যাটবক্সটি ফিক্সড পজিশনে বসিয়ে দেওয়া হলো */}
+        <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 1000 }}>
+          <Chat />
+        </div>
+
         <Footer />
       </Router>
     </CartProvider>

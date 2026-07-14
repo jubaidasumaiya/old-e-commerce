@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "./Home.css";
 
+// 🎯 তোমার ক্লাউডিনারি ক্লাউড নেমটি এখানে বসাবে
+const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME"; 
+
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,19 +18,29 @@ const Home = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-       {/* 🎯 স্মার্ট হাইব্রিড ইউআরএল লজিক */}
- const BACKEND_BASE_URL = import.meta.env.DEV 
-  ? `http://${window.location.hostname}:5001` // লোকাল বা মোবাইলে চললে আইপি ধরবে
-  : "https://old-e-commerce-4.onrender.com"; // 🚀 এখানে তোমার আসল লাইভ রেন্ডার লিংক বসে গেছে!
+        // 🎯 সাধারণ জাভাস্ক্রিপ্ট কমেন্ট ব্যবহার করা হলো (ফিক্সড)
+        const BACKEND_BASE_URL = import.meta.env.DEV 
+          ? `http://${window.location.hostname}:5001` 
+          : "https://old-e-commerce-4.onrender.com";
+
+        // 💡 নোট: ব্যাকএন্ডের রুটটি চেক করে নিবে। যদি /api/product হয়, তবে নিচের ইউআরএল থেকে s কেটে দিবে।
         const response = await axios.get(
           `${BACKEND_BASE_URL}/api/products?page=${currentPage}&limit=20&search=${searchTerm}`
         );
         
-        setProducts(response.data.products);
-        setTotalPages(response.data.totalPages);
+        // ব্যাকএন্ড যদি অবজেক্ট আকারে ডাটা পাঠায়
+        if (response.data && response.data.products) {
+          setProducts(response.data.products);
+          setTotalPages(response.data.totalPages || 1);
+        } else {
+          // ব্যাকএন্ড যদি সরাসরি শুধু অ্যারে পাঠায় (সেফটি ফলব্যাক)
+          setProducts(Array.isArray(response.data) ? response.data : []);
+          setTotalPages(1);
+        }
+        setError(null); // সফল হলে এরর ক্লিয়ার হবে
       } catch (err) {
-        console.error(err);
-        setError("Failed to load products.");
+        console.error("প্রোডাক্ট লোড করতে ঝামেলা হয়েছে: ", err);
+        setError("Failed to load products. Please check backend connection.");
       } finally {
         setLoading(false);
       }
@@ -79,8 +92,23 @@ const Home = () => {
             products.map((product) => (
               <div className="product-card" key={product.sku}>
                 <div className="product-img-wrapper">
-  <img src={product.image || "https://placehold.co/150"} alt={product.name} className="product-img" />
-</div>
+                  {/* 🛡️ এক্সেল শিটের ইমেজ এবং ক্লাউডিনারি অটো-ব্যাকআপ লজিক */}
+                  <img 
+                    src={
+                      product.image && !product.image.includes("default.png")
+                        ? product.image.includes("https://www.stockfixup.com")
+                          ? product.image.replace(
+                              "https://www.stockfixup.com/public/uploads/img/",
+                              `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/stockfixup/`
+                            )
+                          : product.image // যদি অলরেডি অন্য কোনো ম্যানুয়াল লিংক থাকে
+                        : "https://placehold.co/150?text=No+Image" // ডিফল্ট ইমেজের ক্ষেত্রে প্লেসহোল্ডার
+                    } 
+                    alt={product.name} 
+                    className="product-img" 
+                    onError={(e) => { e.target.src = "https://placehold.co/150?text=Image+Error"; }}
+                  />
+                </div>
                 <h3 title={product.name}>{product.name}</h3>
                 <p className="price">৳{product.price}</p>
                 <p className="stock">{product.stock > 0 ? `Stock: ${product.stock} pcs` : "Out of stock"}</p>
@@ -88,7 +116,7 @@ const Home = () => {
               </div>
             ))
           ) : (
-            !loading && <p style={{ textAlign: "center", width: "100%", gridColumn: "1/-1", color: "gray" }}>No products found!</p>
+            !loading && <p style={{ width: "100%", gridColumn: "1/-1", color: "gray", textAlign: "center" }}>No products found!</p>
           )}
         </div>
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,10 +13,10 @@ const AdminLogin = () => {
  // 🔐 LOGIN FUNCTION (আপডেট করা হলো)
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://192.168.0.100:5001/admin/login", {
-        email: email.trim(),
-        password: password.trim(),
-      });
+      const res = await axios.post("http://localhost:5001/admin/login", {
+  email: email.trim(),
+  password: password.trim(),
+});
 
       // ✅ ফিক্স: টোকেনের সাথে এডমিন স্ট্যাটাসও সেভ করা হলো যাতে ProtectedRoute আটকে না দেয়
       localStorage.setItem("token", res.data.token);

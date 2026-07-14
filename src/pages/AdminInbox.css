@@ -1,0 +1,161 @@
+/* মেইন কন্টেইনার */
+.admin-inbox-container {
+  display: flex;
+  height: 85vh;
+  max-width: 1200px;
+  margin: 30px auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* বাম পাশের সাইডবার */
+.sidebar {
+  width: 30%;
+  border-right: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* ইউজার লিস্টের আইটেম */
+.user-token {
+  padding: 14px;
+  background-color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #495057;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.user-token:hover {
+  background-color: #f1f3f5;
+  transform: translateY(-1px);
+}
+
+.user-token.active {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #bae7ff;
+  border-left: 4px solid #1890ff;
+}
+
+/* ডান পাশের চ্যাট উইন্ডো */
+.chat-window {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+
+/* চ্যাট হেডার */
+.chat-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #ffffff;
+}
+
+.chat-header h4 {
+  margin: 0 0 4px 0;
+  color: #212529;
+  font-size: 1.1rem;
+}
+
+.chat-header small {
+  color: #28a745;
+  font-weight: 500;
+}
+
+/* মেসেজ এরিয়া */
+.chat-messages {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* কাস্টম স্ক্রোলবার (চ্যাট মেসেজের জন্য) */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: #ced4da;
+  border-radius: 4px;
+}
+
+/* মেসেজ বাবল ডিজাইন */
+.message-wrapper {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.message-bubble {
+  max-width: 65%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  line-height: 1.4;
+  font-size: 0.95rem;
+}
+
+.message-bubble strong {
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ইনপুট ফর্ম এবং বাটন */
+.chat-input-form {
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 12px;
+  background-color: #fff;
+}
+
+.chat-input-form input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  outline: none;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.chat-input-form input:focus {
+  border-color: #1890ff;
+}
+
+.chat-input-form button {
+  padding: 0 28px;
+  background-color: #1890ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+
+.chat-input-form button:hover {
+  background-color: #40a9ff;
+}

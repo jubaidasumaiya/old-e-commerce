@@ -16,7 +16,7 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         // 🌐 লোকাল JSON ফাইলের বদলে এখন আমাদের লাইভ ব্যাকএন্ড থেকে ডেটা আসবে
-        const res = await fetch(`http://192.168.0.100:5001/api/product/sku/${sku}`);
+       const res = await fetch(`http://localhost:5001/api/product/sku/${sku}`);
         if (!res.ok) throw new Error("Product not found in database");
         const data = await res.json();
         setProduct(data);
@@ -43,7 +43,7 @@ const ProductDetails = () => {
       <h2>{product.name}</h2>
       
       <img 
-        src={product.image || "https:///placehold.co.com/150"} 
+        src={product.image || "https://placehold.co.com/150"} 
         alt={product.name} 
         onError={(e) => { e.target.src = "https:///placehold.co.com/150"; }}
       />

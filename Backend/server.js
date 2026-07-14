@@ -7,9 +7,25 @@ require("dotenv").config();
 const fs = require("fs");
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: [
+      "http://localhost:5173", 
+      "https://delicate-parfait-780e6f.netlify.app/" // 👈 এখানে তোমার আসল নেটলিফাই লিঙ্কটি বসাবে
+    ],
+    methods: ["GET", "POST"],
+  },
+});
 const JWT_SECRET = "mySuperSecretAdminKey123"; 
+
+
+app.use(express.json()); // 👈 এই লাইনটি কি রাউটের ওপরে আছে?
+
 
 // ✅ CORS কনফিগারেশন
 app.use(cors({
@@ -26,6 +42,34 @@ const mongoURI = process.env.MONGO_URI;
 mongoose.connect(mongoURI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+
+  // ➕// ১. স্কিমা আপডেট (roomId যোগ করা হলো)
+const messageSchema = new mongoose.Schema({
+  roomId: { type: String, required: true }, // ➕ কাস্টমারের ইউনিক আইডি বা টোকেন
+  sender: { type: String, required: true }, // 'Customer' বা 'Admin'
+  text: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now }
+});
+const Message = mongoose.model("Message", messageSchema);
+
+// ২. নির্দিষ্ট রুমের মেসেজ হিস্ট্রি আনার API
+app.get("/api/messages/:roomId", async (req, res) => {
+  try {
+    const messages = await Message.find({ roomId: req.params.roomId }).sort({ timestamp: 1 });
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: "History load failed" });
+  }
+});
+// ➕ ডাটাবেজ থেকে সব মেসেজ হিস্ট্রি তুলে আনার API
+app.get("/api/messages", async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ timestamp: 1 }); // পুরনো থেকে নতুন ক্রমে সাজানো
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: "History load failed" });
+  }
+});
 
 // 🔢 ১. AUTO-INCREMENT COUNTER SCHEMA (ইনভয়েস ট্র্যাক রাখার জন্য)
 const counterSchema = new mongoose.Schema({
@@ -665,6 +709,40 @@ app.get("/api/my-orders/:email", async (req, res) => {
   }
 });
 
+io.on("connection", (socket) => {
+  console.log(`⚡ User connected: ${socket.id}`);
+
+  // কাস্টমার বা অ্যাডমিন কোনো রুমে ঢুকলে
+  socket.on("join_room", (roomId) => {
+    socket.join(roomId);
+    console.log(`🚪 User joined room: ${roomId}`);
+  });
+
+  // মেসেজ পাঠানো (কেবল সেই রুমের মেম্বাররাই পাবে)
+  socket.on("send_message", async (data) => {
+    try {
+      const newMessage = new Message({
+        roomId: data.roomId, // ➕
+        sender: data.sender,
+        text: data.text
+      });
+      await newMessage.save();
+
+      // 📢 গ্লোবাল ইমিট (io.emit) বাদ দিয়ে নির্দিষ্ট রুমে পাঠানো হলো
+      io.to(data.roomId).emit("receive_message", data);
+      
+      // অ্যাডমিন ড্যাশবোর্ডকে অ্যালার্ট দেওয়ার জন্য (নতুন মেসেজের নোটিফিকেশন)
+      io.emit("new_chat_notification", data); 
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Disconnected");
+  });
+});
+
 // 🚀 SERVER PORT
 const PORT = process.env.PORT || 5001; // রেন্ডার তার নিজের পোর্ট পাবে, আর লোকাল পিসিতে ৫০০১ পাবে
-app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT} with Socket.io`))
