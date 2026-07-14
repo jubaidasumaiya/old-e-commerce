@@ -16,7 +16,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173", 
-      "https://delicate-parfait-780e6f.netlify.app/" // 👈 এখানে তোমার আসল নেটলিফাই লিঙ্কটি বসাবে
+      "https://delicate-parfait-780e6f.netlify.app" // 👈 এখানে তোমার আসল নেটলিফাই লিঙ্কটি বসাবে
     ],
     methods: ["GET", "POST"],
   },

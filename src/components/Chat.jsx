@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 
-const socket = io.connect("https://old-e-commerce-4.onrender.com");
+// ✅ এই নতুন লাইনটা দিয়ে রিপ্লেস করো:
+const socket = io.connect("https://old-e-commerce-4.onrender.com", {
+  transports: ["websocket", "polling"]
+});
 
 const Chat = () => {
   const [isOpen, setIsOpen] = useState(false); // ➕ চ্যাটবক্স খোলা না বন্ধ তা ট্র্যাক করার জন্য

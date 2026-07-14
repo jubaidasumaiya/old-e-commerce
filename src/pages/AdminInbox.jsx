@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import "./AdminInbox.css";
 
-const socket = io.connect("https://old-e-commerce-4.onrender.com");
+// ✅ এই নতুন লাইনটা দিয়ে রিপ্লেস করো:
+const socket = io.connect("https://old-e-commerce-4.onrender.com", {
+  transports: ["websocket", "polling"]
+});
 
 const AdminInbox = () => {
   const [activeRoom, setActiveRoom] = useState(""); // 👈 কোন কাস্টমারের চ্যাট এখন খোলা
